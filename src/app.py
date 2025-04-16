@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Planets
 #from models import Person
 
 app = Flask(__name__)
@@ -44,6 +44,57 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+## Vamos a crear una ruta para traernos todos los planetas y 1 solo planeta (Vamos a usar dos serialize diferentes)
+
+@app.route('/planets', methods=['GET'])
+def get_all_planets():
+    
+    # Buscamos todos los planetas en la base de datos y guardamos esta búsqueda en la variable planets
+    planets = Planets.query.all()
+    
+    # Comprobamos que hemos encontrado algún planeta
+    if not planets:
+        return jsonify({'msg' : 'Not able to find any planets'}), 404
+    
+    # Serializamos con el método serialize_for_all los planetas que hayamos encontrado
+    planets_serialized = [planet.serialize_for_all() for planet in planets]
+    
+    # Jsonificamos el objeto para mandar al frontend
+    return jsonify({
+        'msg' : 'We find some planets',
+        'planets' : planets_serialized}), 200
+    
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_a_planet(planet_id):
+    
+    planet = Planets.query.get(planet_id)
+    
+    
+    # Comprobamos que hemos encontrado algún planeta
+    if not planet:
+        return jsonify({'msg' : 'Not able to find any planets'}), 404
+    
+    # Jsonificamos el objeto para mandar al frontend
+    return jsonify({
+        'msg' : 'We find the planet',
+        'planet' : planet.serialize_for_one()}), 200
+    
+    
+    
+    
+    
+    
+    
+    
+    # Vamos a buscar todos los favoritos de un usuario (user_id_route porque vendrá de la ruta)
+    # user_favorites = Favorites.query.filter(Favorites.user_id == user_id_route).all()
+    # Ahora tendremos que serializar (Tenemos que hacer algo muy muy muy parecido al serialize de get_all_planets)
+    
+    
+    
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':

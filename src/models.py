@@ -12,7 +12,7 @@ class User (db.Model):
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(255), nullable=False)
 
-    conection_favorites5 = relationship("Favorites", back_populates="conection_favorites5", cascade="all, delete-orphan")
+    conection_favorites5 = relationship("Favorites", back_populates="conection_users", cascade="all, delete-orphan")
 
     def serialize(self):
         return {
@@ -88,7 +88,7 @@ class Species (db.Model):
         "average_height": self.average_height, 
         "language": self.language, 
         "homeworld": self.homeworld 
-         }
+        }
     
 class Planets (db.Model):
     __tablename__ = 'Planets'  
@@ -102,8 +102,7 @@ class Planets (db.Model):
 
     conection_favorites4 = relationship("Favorites", back_populates="conection_planets", cascade="all, delete-orphan")
 
-    
-    def serialize(self):
+    def serialize_for_one(self):
         return {
         "planet_id": self.planet_id,
         "name": self.name,
@@ -111,7 +110,15 @@ class Planets (db.Model):
         "rotation_period": self.rotation_period,
         "gravity": self.gravity,
         "population": self.population
-         }
+        }
+        
+    def serialize_for_all(self):
+        return {
+        "planet_id": self.planet_id,
+        "name": self.name
+        }
+        
+    
     
 class Favorites (db.Model):
     __tablename__ = 'Favorites'  
@@ -135,7 +142,7 @@ class Favorites (db.Model):
         "specie_id": self.specie_id,
         "vehicle_id": self.vehicle_id,
         "character_id": self.character_id
-         }
+        }
     
     
     
